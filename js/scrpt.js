@@ -1,27 +1,40 @@
 const form = document.getElementById('form');
-const email_input = document.getElementById('email-input')
-const password_input = document.getElementById('password-input')
-const error_message = document.getElementById('error-message')
+const name_input = document.getElementById('name-input');
+const email_input = document.getElementById('email-input');
+const password_input = document.getElementById('password-input');
+const repeat_password_input = document.getElementById('repeat-password-input');
+const error_message = document.getElementById('error-message');
 
 form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    let errors = [];
+  e.preventDefault();
+  let errors = [];
 
-    errors = validateloginform(
-        email_input.value,
-        password_input.value
-    );
+  const fileName = e.target.baseURI.split("/").pop();
 
-    //verificar login
-    if (errors.length === 0){
-        const isvalidlogin = verifyLogin(
-            email_input.value,
-            password_input.value
-        );
-        if(!isvalidlogin){
-            errors.push('Email ou senha incorretas');
-        }
-    }
+  if (fileName === "register.html"){
+      errors = validateRegisterForm(
+          name_input.value,
+          email_input.value,
+          password_input.value,
+          repeat_password_input.value
+      );
+  } else{
+      errors = validateloginform(
+          email_input.value,
+          password_input.value
+      );
+  
+      //verificar login
+      if (errors.length === 0){
+          const isvalidlogin = verifyLogin(
+              email_input.value,
+              password_input.value
+          );
+          if(!isvalidlogin){
+              errors.push('Email ou senha incorretas');
+          }
+      }
+  }
 
     if (errors.length > 0) {
         error_message.innerText = errors.join(". ")
@@ -52,6 +65,8 @@ function validateloginform(email, password) {
 const allInputs = [
     email_input,
     password_input,
+    name_input,
+    repeat_password_input
   ].filter((input) => input != null);
   
   allInputs.forEach((input) => {
@@ -86,3 +101,40 @@ function verifyLogin(email, password) {
         return false;
     }
 }   
+
+function validateRegisterForm(name, email, password, repeatPassword) {
+    let errors = [];
+  
+    if (name === "" || name == null) {
+      errors.push("Nome é obrigatório");
+      name_input.parentElement.classList.add("incorrect");
+    }
+  
+    if (email === "" || email == null) {
+      errors.push("Email é obrigatório");
+      email_input.parentElement.classList.add("incorrect");
+    }
+  
+    if (password === "" || password == null) {
+      errors.push("Senha é obrigatória");
+      password_input.parentElement.classList.add("incorrect");
+    } else {
+      if (password.length < 8) {
+        errors.push("Senha deve ter no mínimo 8 caracteres");
+        password_input.parentElement.classList.add("incorrect");
+      }
+    }
+  
+    if (repeatPassword === "" || repeatPassword == null) {
+      errors.push("Repita a senha");
+      repeat_password_input.parentElement.classList.add("incorrect");
+    } else {
+      if (password !== repeatPassword) {
+        errors.push("Senhas não conferem");
+        password_input.parentElement.classList.add("incorrect");
+        repeat_password_input.parentElement.classList.add("incorrect");
+      }
+    }
+  
+    return errors;
+  }
